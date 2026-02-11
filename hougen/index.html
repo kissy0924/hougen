@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>種子島方言バブルクイズ</title>
+  <style>
+    body {
+      font-family: "Hiragino Kaku Gothic ProN", sans-serif;
+      background: linear-gradient(#9dd6ff, #e6f7ff);
+      margin: 0;
+      display: flex;
+      justify-content: center;
+    }
+
+    /* 中央縦長レイアウト */
+    #game {
+      width: 100%;
+      max-width: 400px;
+      padding: 15px;
+      text-align: center;
+    }
+
+    h1 { font-size: 22px; margin-bottom: 8px; }
+    #status { font-size: 14px; margin-bottom: 6px; }
+    #word { font-size: 26px; margin: 16px 0; font-weight: bold; }
+
+    .choices {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .bubble {
+      background: #fff;
+      border-radius: 50%;
+      aspect-ratio: 1 / 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      font-size: 14px;
+      box-shadow: 0 5px 10px rgba(0,0,0,0.25);
+      cursor: pointer;
+      transition: transform .2s, background .2s;
+      user-select: none;
+    }
+    .bubble:hover { transform: scale(1.07); background: #f0fbff; }
+
+    /* オーバーレイ共通 */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      text-align: center;
+      padding: 20px;
+    }
+    .panel {
+      background: white;
+      padding: 25px;
+      border-radius: 18px;
+      max-width: 320px;
+      width: 100%;
+    }
+
+    #resultMessage { font-size: 24px; margin-bottom: 10px; }
+    #correctAnswer { font-size: 16px; margin-bottom: 10px; }
+
+    button {
+      padding: 10px 18px;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background: #4ec3ff;
+      color: white;
+    }
+
+    /* 紙吹雪 */
+    .confetti {
+      position: fixed;
+      width: 12px;
+      height: 18px;
+      top: -20px;
+      opacity: 0.9;
+      animation: fall linear forwards;
+    }
+    @keyframes fall {
+      to { transform: translateY(110vh) rotate(720deg); }
+    }
+  </style>
+</head>
+<body>
+
+<div id="game">
+  <h1>🫧 種子島 方言バブルクイズ 🫧</h1>
+  <div id="status"></div>
+  <div id="word"></div>
+  <div class="choices" id="choices"></div>
+</div>
+
+<div id="startScreen" class="overlay">
+  <div class="panel">
+    <h2>🎮 タップしてスタート！</h2>
+    <p>正解すると方言の音声が流れるよ♪</p>
+    <button onclick="startGame()">スタート</button>
+  </div>
+</div>
+
+<div id="resultScreen" class="overlay" style="display:none;">
+  <div class="panel">
+    <div id="resultMessage"></div>
+    <div id="correctAnswer"></div>
+    <button onclick="nextQuiz()">つぎへ ▶</button>
+  </div>
+</div>
+
+<script>
+const quizData = [
+  { word: "オジー", answer: "夫、主人", audio: "01Oji.mp3" },
+  { word: "バキー", answer: "妻、奥さん", audio: "02Baki.mp3" },
+  { word: "ワー", answer: "あなた、君", audio: "03Wa.mp3" },
+  { word: "ワンタチ", answer: "あなた達", audio: "04Wantachi.mp3" },
+  { word: "オイ(ドン)", answer: "わたし、俺", audio: "05Oi.mp3" },
+  { word: "オイタチ (ドンタチ)", answer: "わたし達", audio: "06Oitachi.mp3" },
+  { word: "アイジョー", answer: "兄さん、若い男の先輩", audio: "07Aijo.mp3" },
+  { word: "アイネー", answer: "姉さん、若い女の先輩", audio: "08Aine.mp3" },
+  { word: "ケナァー", answer: "親戚", audio: "09Kena.mp3" },
+  { word: "カライモ", answer: "さつまいも", audio: "10Karaimo.mp3" },
+  { word: "オオギ", answer: "サトウキビ", audio: "11Ogi.mp3" },
+  { word: "モハミ", answer: "ブダイ", audio: "12Mohami.mp3" },
+  { word: "トッピー", answer: "飛び魚", audio: "13Toppi.mp3" },
+  { word: "ミナ", answer: "磯の巻き貝", audio: "14Mina.mp3" },
+  { word: "バックー", answer: "ヒキガエル", audio: "15Bakku.mp3" },
+  { word: "バンツケ", answer: "夕方", audio: "16Bantsuke.mp3" },
+  { word: "ホナク (ホメク)", answer: "暑い", audio: "17Honaku.mp3" },
+  { word: "ヒヤカ", answer: "寒い、冷たい", audio: "18Hiyaka.mp3" },
+  { word: "ハエンカゼ", answer: "南風", audio: "19Haenkaze.mp3" },
+  { word: "メッカリモウサン", answer: "こんにちわ", audio: "20Mekkarimosan.mp3" },
+  { word: "オジャリモウセ", answer: "いらっしゃいませ", audio: "21Ojarimose.mp3" },
+  { word: "ノッチーヨ", answer: "さようなら", audio: "22Notchiyo.mp3" },
+  { word: "オーキニ", answer: "ありがとう", audio: "23Okini.mp3" },
+  { word: "キバル", answer: "頑張る", audio: "24Kibaru.mp3" },
+  { word: "オヨナァ", answer: "そうだね", audio: "25Oyona.mp3" },
+  { word: "アバヨー", answer: "驚いたときに発する言葉", audio: "26Abayo.mp3" },
+  { word: "オヨ", answer: "はい、わかりました", audio: "27Oyo.mp3" },
+  { word: "ネギル", answer: "叱る", audio: "28Negiru.mp3" },
+  { word: "ゴーラシカ", answer: "かわいそう", audio: "29Gorashika.mp3" },
+  { word: "ナッシェー", answer: "どうして？、なんで？", audio: "30Nasshe.mp3" },
+  { word: "ハバシカ", answer: "素早い", audio: "31Habashika.mp3" },
+  { word: "タイソカ", answer: "きつい、難儀", audio: "32Taisoka.mp3" },
+  { word: "ナオス", answer: "片付ける", audio: "33Naosu.mp3" },
+  { word: "カルー", answer: "背負う", audio: "34Karu.mp3" },
+  { word: "ムジョカ", answer: "かわいい", audio: "35Mujoka.mp3" },
+  { word: "エークラー", answer: "酔っぱらい", audio: "36Ekura.mp3" },
+  { word: "オラブ", answer: "大声を出す", audio: "37Orabu.mp3" },
+  { word: "チット", answer: "少し", audio: "38Chitto.mp3" },
+  { word: "タイチェ", answer: "たくさん", audio: "39Taiche.mp3" }
+];
+
+const totalQuestions = 10;
+let questions = [];
+let current = 0;
+let score = 0;
+
+function shuffle(a){ return a.sort(()=>Math.random()-0.5); }
+
+function startGame(){
+  document.getElementById("startScreen").style.display = "none";
+  questions = shuffle([...quizData]).slice(0,totalQuestions);
+  current = 0; score = 0;
+  loadQuiz();
+}
+
+function loadQuiz(){
+  const q = questions[current];
+  document.getElementById("status").textContent = `第 ${current+1} 問 / ${totalQuestions} ｜ スコア：${score}`;
+  document.getElementById("word").textContent = `「${q.word}」の意味は？`;
+
+  let choices = shuffle(quizData.map(x=>x.answer).filter(a=>a!==q.answer)).slice(0,3);
+  choices.push(q.answer);
+  choices = shuffle(choices);
+
+  const box = document.getElementById("choices");
+  box.innerHTML="";
+  choices.forEach((c,i)=>{
+    const div=document.createElement("div");
+    div.className="bubble";
+    div.textContent=c;
+    div.onclick=()=>checkAnswer(c);
+    box.appendChild(div);
+  });
+}
+
+function checkAnswer(choice){
+  const q = questions[current];
+  const correct = q.answer;
+  const result = document.getElementById("resultScreen");
+  document.getElementById("resultMessage").textContent = choice===correct?"⭕ 正解！":"ざんねん…";
+  document.getElementById("correctAnswer").textContent = `正解：${correct}`;
+  result.style.display="flex";
+
+  if(choice===correct){
+    score+=10;
+    // 正解時に音声を再生
+    if(q.audio){
+      const audio = new Audio(q.audio);
+      audio.play().catch(e => console.error("Audio play error:", e));
+    }
+    launchConfetti();
+  }
+}
+
+function nextQuiz(){
+  document.getElementById("resultScreen").style.display="none";
+  current++;
+  if(current<totalQuestions) loadQuiz();
+  else showFinal();
+}
+
+function showFinal(){
+  const result = document.getElementById("resultScreen");
+  document.getElementById("resultMessage").textContent = `🎉 スコア：${score}`;
+  document.getElementById("correctAnswer").innerHTML = `<button onclick="startGame()">もう一度あそぶ</button>`;
+  result.style.display="flex";
+  launchConfetti(40);
+}
+
+function launchConfetti(amount=25){
+  for(let i=0;i<amount;i++){
+    const c=document.createElement("div");
+    c.className="confetti";
+    c.style.left=Math.random()*100+"vw";
+    c.style.background=`hsl(${Math.random()*360},100%,60%)`;
+    c.style.animationDuration=2+Math.random()*2+"s";
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(),4000);
+  }
+}
+
+window.addEventListener("keydown",e=>{
+  const bubbles=document.querySelectorAll(".bubble");
+  if(e.key>="1" && e.key<="4"){
+    bubbles[e.key-1]?.click();
+  }
+});
+</script>
+</body>
+</html>
