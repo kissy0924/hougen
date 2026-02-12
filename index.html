@@ -156,7 +156,7 @@
     <div class="panel">
       <div id="resultMessage" style="font-size: 3.5vh; margin-bottom: 2vh; font-weight:bold;"></div>
       <div id="correctAnswer" style="margin-bottom: 3vh; font-size: 2vh;"></div>
-      <button onclick="nextQuiz()">つぎへ ▶</button>
+      <button id="nextBtn" onclick="nextQuiz()">つぎへ ▶</button>
     </div>
   </div>
 
@@ -218,10 +218,13 @@
         currentAudio.currentTime = 0;
       }
       currentAudio = new Audio(src);
-      currentAudio.play().catch(e => console.log("Audio play error:", e));
       if (onEnded) {
         currentAudio.onended = onEnded;
       }
+      currentAudio.play().catch(e => {
+        console.log("Audio play error:", e);
+        if (onEnded) onEnded();
+      });
     }
 
     // スタートボタン：00startを再生 → 終了後にゲーム開始
@@ -265,14 +268,24 @@
       document.getElementById("correctAnswer").textContent = `正解：${q.answer}`;
       result.style.display = "flex";
 
+      document.getElementById("nextBtn").style.visibility = "hidden"; // Hide initially
+
       if (isCorrect) {
         score += 10;
         // 正解音 → 方言音声
         playAudio("00seikai.mp3", () => {
-          if (q.audio) playAudio(q.audio);
+          if (q.audio) {
+            playAudio(q.audio, () => {
+              document.getElementById("nextBtn").style.visibility = "visible";
+            });
+          } else {
+            document.getElementById("nextBtn").style.visibility = "visible";
+          }
         });
       } else {
-        playAudio("00hazure.mp3");
+        playAudio("00hazure.mp3", () => {
+          document.getElementById("nextBtn").style.visibility = "visible";
+        });
       }
     }
 
