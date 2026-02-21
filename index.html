@@ -1,144 +1,54 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>種子島方言バブルクイズ</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
+    * { box-sizing: border-box; }
     body {
-      margin: 0;
-      padding: 0;
+      margin: 0; padding: 0;
       background: #000 url("bg.png") no-repeat center center fixed;
       background-size: contain;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100dvh;
-      width: 100vw;
-      overflow: hidden;
+      display: flex; justify-content: center; align-items: center;
+      height: 100dvh; width: 100vw; overflow: hidden;
     }
-
     #game {
-      height: 95vh;
-      width: min(95vw, calc(95vh * 9 / 16));
-      background: rgba(0, 0, 0, 0.4);
-      border: 2px solid rgba(255, 255, 255, 0.2);
-      border-radius: 20px;
-      padding: 3vh 2vh;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      position: relative;
-      z-index: 1;
+      height: 95vh; width: min(95vw, calc(95vh * 9 / 16));
+      background: rgba(0, 0, 0, 0.4); border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px; padding: 3vh 2vh; text-align: center;
+      display: flex; flex-direction: column; justify-content: space-between;
+      position: relative; z-index: 1;
     }
-
-    h1 {
-      font-size: clamp(14px, 2.5vh, 22px);
-      margin: 0;
-      color: #fff;
-      text-shadow: 2px 2px 4px #000;
-    }
-
+    h1 { font-size: clamp(20px, 4.5vh, 30px); margin: 0; color: #fff; text-shadow: 2px 2px 4px #000; white-space: nowrap; }
     #status {
-      font-size: 1.8vh;
-      color: #fff;
-      background: rgba(0, 0, 0, 0.6);
-      padding: 5px 15px;
-      border-radius: 20px;
-      align-self: center;
+      font-size: 2.4vh; color: #fff; background: rgba(0, 0, 0, 0.6);
+      padding: 10px 15px; border-radius: 20px; align-self: center;
+      display: flex; flex-direction: column; justify-content: center;
+      align-items: center; gap: 5px; width: fit-content; min-width: 60%; line-height: 1.2;
     }
-
-    #word {
-      font-size: clamp(18px, 4.5vh, 32px);
-      font-weight: bold;
-      color: #fff;
-      text-shadow: 2px 2px 10px #000;
-      margin: 1vh 0;
-    }
-
-    .choices {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2vh;
-      width: 100%;
-      flex-grow: 1;
-      align-content: center;
-    }
-
+    #word { font-size: clamp(18px, 4.5vh, 32px); font-weight: bold; color: #fff; text-shadow: 2px 2px 10px #000; margin: 1vh 0; }
+    .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 2vh; width: 100%; flex-grow: 1; align-content: center; }
     .bubble {
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 50%;
-      aspect-ratio: 1 / 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 10%;
-      font-size: clamp(10px, 1.8vh, 15px);
-      font-weight: bold;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-      cursor: pointer;
-      color: #222;
-      line-height: 1.3;
+      background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.9) 0%, rgba(200, 230, 255, 0.6) 50%, rgba(100, 180, 255, 0.4) 100%);
+      border-radius: 50%; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center;
+      padding: 10%; font-size: clamp(20px, 3.6vh, 30px); font-weight: bold;
+      box-shadow: inset -5px -5px 15px rgba(0, 0, 0, 0.1), inset 5px 5px 15px rgba(255, 255, 255, 0.8), 0 4px 15px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.5); cursor: pointer; color: #222; line-height: 1.3; transition: transform 0.1s;
     }
-
-    .bubble:active {
-      transform: scale(0.92);
-    }
-
-    .overlay {
-      position: fixed;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 20;
-    }
-
-    #startScreen {
-      background: #000 url("title.png") no-repeat center center;
-      background-size: contain;
-    }
-
-    #resultScreen {
-      background: rgba(0, 0, 0, 0.85);
-    }
-
-    .panel {
-      background: rgba(255, 255, 255, 0.9);
-      padding: 4vh 20px;
-      border-radius: 20px;
-      width: 80%;
-      max-width: 300px;
-      text-align: center;
-    }
-
-    button {
-      padding: 1.5vh 3vh;
-      font-size: clamp(16px, 2.8vh, 24px);
-      font-weight: bold;
-      border: none;
-      border-radius: 15px;
-      background: #ffaa00;
-      color: #fff;
-      box-shadow: 0 5px 0 #cc8800;
-      cursor: pointer;
-    }
-
-    button:active {
-      transform: translateY(3px);
-      box-shadow: none;
-    }
+    .bubble:active { transform: scale(0.92); }
+    .overlay { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 20; }
+    #startScreen { background: #000 url("title.png") no-repeat center center; background-size: contain; }
+    #resultScreen, #rankScreen { background: rgba(0, 0, 0, 0.85); }
+    .panel { background: rgba(255, 255, 255, 0.9); padding: 4vh 20px; border-radius: 20px; width: 80%; max-width: 300px; text-align: center; position: relative; }
+    button { padding: 1.5vh 3vh; font-size: clamp(16px, 2.8vh, 24px); font-weight: bold; border: none; border-radius: 15px; background: #ffaa00; color: #fff; box-shadow: 0 5px 0 #cc8800; cursor: pointer; }
+    button:active { transform: translateY(3px); box-shadow: none; }
+    #startScreen button { font-size: clamp(24px, 4.2vh, 36px); display: block; margin: 0 auto; }
+    #startScreen .panel { background: transparent !important; padding: 0; height: auto; display: flex; align-items: center; justify-content: center; }
+    #confettiCanvas { position: fixed; inset: 0; pointer-events: none; z-index: 30; }
   </style>
 </head>
-
 <body>
-
   <div id="game">
     <h1>🫧 種子島 方言クイズ 🫧</h1>
     <div id="status"></div>
@@ -147,21 +57,37 @@
   </div>
 
   <div id="startScreen" class="overlay">
-    <div class="panel" style="margin-top: 30vh; background: rgba(255,255,255,0.7);">
-      <button onclick="startGame()">スタート</button>
+    <div class="panel" style="margin-top: 30vh;">
+      <button onclick="startGameWithAudio()">スタート</button>
     </div>
   </div>
 
   <div id="resultScreen" class="overlay" style="display:none;">
     <div class="panel">
       <div id="resultMessage" style="font-size: 3.5vh; margin-bottom: 2vh; font-weight:bold;"></div>
-      <div id="correctAnswer" style="margin-bottom: 3vh; font-size: 2vh;"></div>
+      <div id="correctAnswer" style="margin-bottom: 3vh; font-size: 3.2vh;"></div>
       <button id="nextBtn" onclick="nextQuiz()">つぎへ ▶</button>
     </div>
   </div>
 
+  <div id="rankScreen" class="overlay" style="display:none;">
+    <div class="panel">
+      <div style="font-size: 1.6vh; color: #666;">獲得得点 ｜ クリアタイム</div>
+      <div style="margin-bottom: 2vh;">
+        <span id="finalScore" style="font-size: 4vh; font-weight: bold;"></span>
+        <span style="font-size: 2vh; color: #666; margin: 0 5px;">/</span>
+        <span id="totalTimeDisplay" style="font-size: 2.5vh; font-weight: bold;"></span>
+      </div>
+      <div style="font-size: 2vh; color: #666;">称号名</div>
+      <div id="rankTitle" style="font-size: 3vh; font-weight: bold; color: #d40000; margin-bottom: 2vh;"></div>
+      <div id="rankMessage" style="font-size: 1.8vh; line-height: 1.4; margin-bottom: 3vh; background: #eee; padding: 10px; border-radius: 10px;"></div>
+      <button onclick="location.reload()">もう一度遊ぶ</button>
+    </div>
+  </div>
+
+  <canvas id="confettiCanvas"></canvas>
+
   <script>
-    // クイズデータ
     const quizData = [
       { word: "オジー", answer: "夫、主人", audio: "01Oji.mp3" },
       { word: "バキー", answer: "妻、奥さん", audio: "02Baki.mp3" },
@@ -206,42 +132,41 @@
 
     const totalQuestions = 10;
     let questions = []; let current = 0; let score = 0;
+    let comboCount = 0;
+    let totalThinkingTime = 0;
+    let questionStartTime = 0;
+    
+    const voiceAudio = new Audio();
+    const effectAudio = new Audio();
+
+    function playSound(audioObj, src, onEnded) {
+      audioObj.pause();
+      audioObj.src = src;
+      audioObj.currentTime = 0;
+      audioObj.onended = onEnded || null;
+      audioObj.play().catch(() => { if (onEnded) onEnded(); });
+    }
 
     function shuffle(a) { return a.sort(() => Math.random() - 0.5); }
 
-    // グローバル変数で再生中の音声を管理
-    let currentAudio = null;
-
-    function playAudio(src, onEnded) {
-      if (currentAudio) {
-        currentAudio.pause();
-        currentAudio.currentTime = 0;
-      }
-      currentAudio = new Audio(src);
-      if (onEnded) {
-        currentAudio.onended = onEnded;
-      }
-      currentAudio.play().catch(e => {
-        console.log("Audio play error:", e);
-        if (onEnded) onEnded();
-      });
-    }
-
-    // スタートボタン：00startを再生 → 終了後にゲーム開始
-    function startGame() {
-      playAudio("00start.mp3", () => {
+    function startGameWithAudio() {
+      // 00start.mp3 を再生してゲーム開始（00_nazo01.mp3の停止処理は削除済み）
+      playSound(effectAudio, "00start.mp3", () => {
         document.getElementById("startScreen").style.display = "none";
         questions = shuffle([...quizData]).slice(0, totalQuestions);
-        current = 0; score = 0;
+        current = 0; score = 0; comboCount = 0; totalThinkingTime = 0;
         loadQuiz();
       });
     }
 
-    // 出題：00mondaiを再生
     function loadQuiz() {
-      playAudio("00mondai.mp3");
+      playSound(effectAudio, "00mondai.mp3");
       const q = questions[current];
-      document.getElementById("status").textContent = `第 ${current + 1} 問 / ${totalQuestions} ｜ スコア：${score}`;
+      const comboRow = comboCount > 0 ? `<div>🫧×${comboCount} コンボ！</div>` : "<div>&nbsp;</div>";
+      document.getElementById("status").innerHTML = `
+        <div>🎯 ${current + 1} / ${totalQuestions} ｜ 🚀 ${score}</div>
+        ${comboRow}
+      `;
       document.getElementById("word").textContent = `「${q.word}」の意味は？`;
 
       let choices = shuffle(quizData.map(x => x.answer).filter(a => a !== q.answer)).slice(0, 3);
@@ -257,55 +182,104 @@
         div.onclick = () => checkAnswer(c);
         box.appendChild(div);
       });
+      questionStartTime = Date.now();
     }
 
-    // 判定：正解(00seikai→方言) / 外れ(00hazure)
     function checkAnswer(choice) {
+      const responseTime = (Date.now() - questionStartTime) / 1000;
+      totalThinkingTime += responseTime;
+
       const q = questions[current];
       const isCorrect = choice === q.answer;
       const result = document.getElementById("resultScreen");
-      document.getElementById("resultMessage").textContent = isCorrect ? "⭕ 正解！" : "❌ ざんねん…";
-      document.getElementById("correctAnswer").textContent = `正解：${q.answer}`;
-      result.style.display = "flex";
-
-      document.getElementById("nextBtn").style.visibility = "hidden"; // Hide initially
 
       if (isCorrect) {
-        score += 10;
-        // 正解音 → 方言音声
-        playAudio("00seikai.mp3", () => {
-          if (q.audio) {
-            playAudio(q.audio, () => {
-              document.getElementById("nextBtn").style.visibility = "visible";
-            });
-          } else {
+        let addedScore = 10 * Math.pow(2, comboCount);
+        score += addedScore;
+        comboCount++;
+        document.getElementById("resultMessage").textContent = `⭕ 正解！ +${addedScore}`;
+        
+        playSound(effectAudio, "00seikai.mp3");
+        if (q.audio) {
+          playSound(voiceAudio, q.audio, () => {
             document.getElementById("nextBtn").style.visibility = "visible";
-          }
-        });
+          });
+        } else {
+          document.getElementById("nextBtn").style.visibility = "visible";
+        }
       } else {
-        playAudio("00hazure.mp3", () => {
+        comboCount = 0;
+        document.getElementById("resultMessage").textContent = "❌ ざんねん…";
+        playSound(effectAudio, "00hazure.mp3", () => {
           document.getElementById("nextBtn").style.visibility = "visible";
         });
       }
+
+      document.getElementById("correctAnswer").textContent = `正解：${q.answer}`;
+      result.style.display = "flex";
+      document.getElementById("nextBtn").style.visibility = "hidden";
     }
 
     function nextQuiz() {
       document.getElementById("resultScreen").style.display = "none";
       current++;
       if (current < totalQuestions) loadQuiz();
-      else showFinal();
+      else showRank();
     }
 
-    function showFinal() {
-      const result = document.getElementById("resultScreen");
-      document.getElementById("resultMessage").textContent = `🎉 終了！`;
-      document.getElementById("correctAnswer").innerHTML = `スコア：<strong>${score} 点</strong>`;
-      const btn = result.querySelector("button");
-      btn.textContent = "もう一度あそぶ";
-      btn.onclick = () => location.reload();
-      result.style.display = "flex";
+    function showRank() {
+      const fanfare = new Audio("00_fanfare.ogg");
+      fanfare.volume = 0.5;
+      fanfare.play();
+      
+      const rankScreen = document.getElementById("rankScreen");
+      document.getElementById("finalScore").textContent = `${score} 点`;
+      document.getElementById("totalTimeDisplay").textContent = `${totalThinkingTime.toFixed(2)} 秒`;
+
+      const title = document.getElementById("rankTitle");
+      const msg = document.getElementById("rankMessage");
+      let rank = 0;
+      if (score >= 8001) { rank = 3; title.textContent = "伝説の種子島語り部"; msg.textContent = "あっぱれ！あなたはもう島の人も驚くほどの方言マスター。"; }
+      else if (score >= 3001) { rank = 2; title.textContent = "H3ロケット級の精鋭"; msg.textContent = "素晴らしい！言葉の打ち上げ成功率は抜群です。"; }
+      else if (score >= 1001) { rank = 1; title.textContent = "安納いも級の甘熟者"; msg.textContent = "かなり詳しいですね。島の言葉の深みが熟してきています。"; }
+      else if (score >= 301) { rank = 1; title.textContent = "鉄砲伝来の門下生"; msg.textContent = "基礎はバッチリ。新しい言葉の衝撃を吸収していきましょう！"; }
+      else { rank = 0; title.textContent = "よかよか観光生"; msg.textContent = "まずは島を楽しむことから！「よかよか」の精神で。"; }
+
+      rankScreen.style.display = "flex";
+      if (rank > 0) startConfetti(rank);
+    }
+
+    function startConfetti(intensity) {
+      const canvas = document.getElementById("confettiCanvas");
+      const ctx = canvas.getContext("2d");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      let particles = [];
+      const colors = ["#FFC700", "#FF0000", "#2E3192", "#00AEEF", "#ED1C24", "#FFF"];
+      for (let i = 0; i < intensity * 50; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height - canvas.height,
+          size: Math.random() * 8 + 4,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          speed: Math.random() * 3 + 2,
+          angle: Math.random() * 6.28,
+          rotationSpeed: Math.random() * 0.1
+        });
+      }
+      function update() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => {
+          p.y += p.speed; p.angle += p.rotationSpeed;
+          ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.angle);
+          ctx.fillStyle = p.color; ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+          ctx.restore();
+          if (p.y > canvas.height) p.y = -20;
+        });
+        requestAnimationFrame(update);
+      }
+      update();
     }
   </script>
 </body>
-
 </html>
