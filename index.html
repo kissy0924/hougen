@@ -140,30 +140,17 @@
     const effectAudio = new Audio();
 
     function playSound(audioObj, src, onEnded) {
-      if (!src) { if (onEnded) onEnded(); return; }
       audioObj.pause();
-      audioObj.src = "";
-      audioObj.onended = onEnded || null;
-      audioObj.onerror = () => { if (onEnded) onEnded(); };
       audioObj.src = src;
-      // 00seikai.mp3の場合のみ音量を0.7に設定。それ以外は1.0。
-      audioObj.volume = (src === "00seikai.mp3") ? 0.7 : 1.0;
-      audioObj.load();
-      
-      const playPromise = audioObj.play();
-      if (playPromise !== undefined) {
-        playPromise.catch(() => { 
-          if (onEnded) onEnded(); 
-        });
-      }
+      audioObj.currentTime = 0;
+      audioObj.onended = onEnded || null;
+      audioObj.play().catch(() => { if (onEnded) onEnded(); });
     }
 
     function shuffle(a) { return a.sort(() => Math.random() - 0.5); }
 
     function startGameWithAudio() {
-      effectAudio.pause();
-      voiceAudio.pause();
-      
+      // 00start.mp3 を再生してゲーム開始（00_nazo01.mp3の停止処理は削除済み）
       playSound(effectAudio, "00start.mp3", () => {
         document.getElementById("startScreen").style.display = "none";
         questions = shuffle([...quizData]).slice(0, totalQuestions);
@@ -213,14 +200,10 @@
         document.getElementById("resultMessage").textContent = `⭕ 正解！ +${addedScore}`;
         
         playSound(effectAudio, "00seikai.mp3");
-        
         if (q.audio) {
-          // 正解音の再生開始から1秒待ってから方言音声を再生
-          setTimeout(() => {
-            playSound(voiceAudio, q.audio, () => {
-              document.getElementById("nextBtn").style.visibility = "visible";
-            });
-          }, 1000);
+          playSound(voiceAudio, q.audio, () => {
+            document.getElementById("nextBtn").style.visibility = "visible";
+          });
         } else {
           document.getElementById("nextBtn").style.visibility = "visible";
         }
@@ -245,9 +228,9 @@
     }
 
     function showRank() {
-      const fanfare = new Audio("00_fanfare.mp3");
+      const fanfare = new Audio("00_fanfare.ogg");
       fanfare.volume = 0.5;
-      fanfare.play().catch(() => {});
+      fanfare.play();
       
       const rankScreen = document.getElementById("rankScreen");
       document.getElementById("finalScore").textContent = `${score} 点`;
